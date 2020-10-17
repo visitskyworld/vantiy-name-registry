@@ -17,6 +17,7 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
+mod benchmarking;
 mod default_weights;
 
 #[derive(Decode, Encode, Clone, Eq, PartialEq, Debug)]

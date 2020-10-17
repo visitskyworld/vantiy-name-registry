@@ -3259,8 +3259,10 @@ dependencies = [
  "sp-inherents",
  "sp-runtime",
  "sp-transaction-pool",
+ "sp-trie",
  "structopt",
  "substrate-build-script-utils",
+ "substrate-frame-cli",
  "substrate-frame-rpc-system",
 ]
 
@@ -6590,6 +6592,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "substrate-frame-cli"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ebb5a3b610d539342fbf2d15173d69cc7801015020501ade8f5c02b6b6e3974"
+dependencies = [
+ "frame-system",
+ "sc-cli",
+ "sp-core",
+ "sp-runtime",
+ "structopt",
+]
+
+[[package]]
 name = "substrate-frame-rpc-system"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7347,6 +7362,7 @@ dependencies = [
 name = "vanity-registry"
 version = "2.0.0"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-balances",
