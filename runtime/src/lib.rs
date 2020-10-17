@@ -93,6 +93,8 @@ pub mod opaque {
     }
 }
 
+mod weights;
+
 pub const VERSION: RuntimeVersion = RuntimeVersion {
     spec_name: create_runtime_str!("node-template"),
     impl_name: create_runtime_str!("node-template"),
@@ -275,6 +277,7 @@ impl vanity_registry::Trait for Runtime {
     type RegisterPeriod = RegisterPeriod;
     type FundToLock = FundToLock;
     type Name = Vec<u8>;
+    type WeightInfo = weights::vanity_registry::WeightInfo;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.

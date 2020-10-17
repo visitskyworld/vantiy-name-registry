@@ -79,6 +79,7 @@ impl Trait for Test {
     type RegisterPeriod = RegisterPeriod;
     type FundToLock = FundToLock;
     type Name = Vec<u8>;
+    type WeightInfo = ();
 }
 
 pub type Template = Module<Test>;

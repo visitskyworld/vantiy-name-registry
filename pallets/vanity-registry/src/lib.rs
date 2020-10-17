@@ -4,6 +4,7 @@ use codec::{Decode, Encode, EncodeLike};
 use frame_support::{
     decl_error, decl_event, decl_module, decl_storage, dispatch, ensure,
     traits::{Currency, Get, LockIdentifier, LockableCurrency, WithdrawReasons},
+    weights::Weight,
     IterableStorageMap,
 };
 use frame_system::ensure_signed;
@@ -15,6 +16,8 @@ mod mock;
 
 #[cfg(test)]
 mod tests;
+
+mod default_weights;
 
 #[derive(Decode, Encode, Clone, Eq, PartialEq, Debug)]
 /// The period during which a fund for a commit will be locked
@@ -58,6 +61,13 @@ impl<T: frame_system::Trait> Default for LockPeriodOption<T> {
 type BalanceOf<T> =
     <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
 
+pub trait WeightInfo {
+    fn commit() -> Weight;
+    fn reveal(name_length: usize) -> Weight;
+    fn renew() -> Weight;
+    fn unregister() -> Weight;
+}
+
 pub trait Trait: frame_system::Trait {
     /// This pallet declares its own events.
     type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
@@ -71,6 +81,8 @@ pub trait Trait: frame_system::Trait {
     type FundToLock: Get<BalanceOf<Self>>;
     /// The type of the names which are the main assets of this module.
     type Name: EncodeLike + Clone + Decode + Eq + PartialEq + Debug;
+    /// Weight information for extrinsics in this pallet.
+    type WeightInfo: WeightInfo;
 }
 
 decl_storage! {
@@ -115,7 +127,7 @@ decl_module! {
 
         fn deposit_event() = default;
 
-        #[weight = 10_000 + T::DbWeight::get().reads_writes(0,1)]
+        #[weight = T::WeightInfo::commit()]
         /// Commit the hash of 'your id concatenated to your desired name'.
         /// Reveal the name only after you made sure your commit is registered.
         pub fn commit(origin, hash: T::Hash) -> dispatch::DispatchResult {
@@ -128,8 +140,7 @@ decl_module! {
             Ok(())
         }
 
-        #[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
-        // TODO fix weights
+        #[weight = T::WeightInfo::reveal(name.encode().len())]
         /// Reveal the name for which you have previously registered a commit.
         pub fn reveal(origin, name: T::Name) -> dispatch::DispatchResult {
             let who = ensure_signed(origin)?;
@@ -155,8 +166,7 @@ decl_module! {
             Ok(())
         }
 
-        #[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
-        // TODO fix weights
+        #[weight = T::WeightInfo::renew()]
         /// Renew the "name" for "origin". The name should belong to "origin" in the first place.
         /// When successful, this will extend the register period by another "RegisterPeriod" since
         /// the renew time.
@@ -176,8 +186,7 @@ decl_module! {
             Ok(())
         }
 
-        #[weight = 10_000 + T::DbWeight::get().reads_writes(1,1)]
-        // TODO fix weights
+        #[weight = T::WeightInfo::unregister()]
         /// Unregister the name for origin and unlock the associated fund
         pub fn unregister(origin, name: T::Name) -> dispatch::DispatchResult {
             let who = ensure_signed(origin)?;
