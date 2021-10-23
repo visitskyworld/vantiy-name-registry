@@ -1,13 +1,13 @@
 [package]
-name = 'pallet-template'
-version = '3.0.0-monthly-2021-10'
-description = 'FRAME pallet template for defining custom runtime logic.'
-authors = ['Substrate DevHub <https://github.com/substrate-developer-hub>']
+name = 'vanity-registry'
+version = '3.0.0'
+description = 'FRAME pallet for registering vanity names/urls/domains'
+authors = ['Alex Sedighi', 'Substrate DevHub <https://github.com/substrate-developer-hub>']
 homepage = 'https://substrate.io/'
 edition = '2018'
 license = 'Unlicense'
 publish = false
-repository = 'https://github.com/substrate-developer-hub/substrate-node-template/'
+repository = 'https://github.com/alexsednz/vantiy-name-registry/'
 
 [package.metadata.docs.rs]
 targets = ['x86_64-unknown-linux-gnu']
@@ -42,6 +42,18 @@ default-features = false
 features = ['derive']
 version = '1.0'
 
+[dependencies.sp-std]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
+
+[dependencies.sp-runtime]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+tag = 'monthly-2021-10'
+version = '4.0.0-dev'
+
 [dev-dependencies.sp-core]
 default-features = false
 git = 'https://github.com/paritytech/substrate.git'
@@ -54,8 +66,7 @@ git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-10'
 version = '4.0.0-dev'
 
-[dev-dependencies.sp-runtime]
-default-features = false
+[dev-dependencies.pallet-balances]
 git = 'https://github.com/paritytech/substrate.git'
 tag = 'monthly-2021-10'
 version = '4.0.0-dev'
@@ -64,10 +75,10 @@ version = '4.0.0-dev'
 default = ['std']
 runtime-benchmarks = ['frame-benchmarking']
 std = [
-    'codec/std',
-    'scale-info/std',
-    'frame-support/std',
-    'frame-system/std',
-    'frame-benchmarking/std',
+	'codec/std',
+	'scale-info/std',
+	'frame-support/std',
+	'frame-system/std',
+	'frame-benchmarking/std',
 ]
 try-runtime = ['frame-support/try-runtime']

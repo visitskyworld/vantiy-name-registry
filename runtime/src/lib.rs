@@ -26,7 +26,7 @@ use sp_version::RuntimeVersion;
 // A few exports that help ease life for downstream crates.
 pub use frame_support::{
 	construct_runtime, parameter_types,
-	traits::{KeyOwnerProofSystem, Randomness, StorageInfo},
+	traits::{KeyOwnerProofSystem, LockIdentifier, Randomness, StorageInfo},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 		IdentityFee, Weight,
@@ -41,7 +41,7 @@ pub use sp_runtime::BuildStorage;
 pub use sp_runtime::{Perbill, Permill};
 
 /// Import the template pallet.
-pub use pallet_template;
+pub use vanity_registry;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -272,9 +272,21 @@ impl pallet_sudo::Config for Runtime {
 	type Call = Call;
 }
 
-/// Configure the pallet-template in pallets/template.
-impl pallet_template::Config for Runtime {
+parameter_types! {
+	pub const VanityRegistryId: LockIdentifier = *b"registry";
+	pub const RegisterPeriod: BlockNumber = 7 * DAYS;
+	pub const FundToLock: Balance = 113;
+	pub const NameMaxLen: u32 = 255;
+}
+impl vanity_registry::Config for Runtime {
 	type Event = Event;
+	type Currency = Balances;
+	type ModuleId = VanityRegistryId;
+	type RegisterPeriod = RegisterPeriod;
+	type FundToLock = FundToLock;
+	type Name = Vec<u8>;
+	type NameMaxLen = NameMaxLen;
+	type WeightInfo = ();
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -293,7 +305,7 @@ construct_runtime!(
 		TransactionPayment: pallet_transaction_payment::{Pallet, Storage},
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>},
 		// Include the custom logic from the pallet-template in the runtime.
-		TemplateModule: pallet_template::{Pallet, Call, Storage, Event<T>},
+		VanityRegistry: vanity_registry::{Pallet, Call, Storage, Event<T>},
 	}
 );
 
@@ -470,7 +482,7 @@ impl_runtime_apis! {
 			list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
 			list_benchmark!(list, extra, pallet_balances, Balances);
 			list_benchmark!(list, extra, pallet_timestamp, Timestamp);
-			list_benchmark!(list, extra, pallet_template, TemplateModule);
+			list_benchmark!(list, extra, vanity_registry, VanityRegistry);
 
 			let storage_info = AllPalletsWithSystem::storage_info();
 
@@ -504,7 +516,7 @@ impl_runtime_apis! {
 			add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
 			add_benchmark!(params, batches, pallet_balances, Balances);
 			add_benchmark!(params, batches, pallet_timestamp, Timestamp);
-			add_benchmark!(params, batches, pallet_template, TemplateModule);
+			add_benchmark!(params, batches, vanity_registry, VanityRegistry);
 
 			if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
 			Ok(batches)
